@@ -20,7 +20,8 @@ class PromqlFunction(StrEnum):
     RATE = "rate"
 
 class MetricLabels:
-    NETWORK_DEVICE = {"device": "enp59s0u1u4"}
+    #NETWORK_DEVICE = {"device": "enp59s0u1u4"}
+    NETWORK_DEVICE = {"device": "lo"}
 
 
 PERFORMANCE_METRICS = [
@@ -62,6 +63,7 @@ def query_prometheus(metrics_url, promql_function, metric_name, label_filter, du
     for sample in result_json:
 
         if all(sample["metric"].get(k) == v for k, v in label_filter.items()):
+            # First value is timestamp second is the value of metric as a string
             result_value = float(sample["value"][1])
             return result_value
 

@@ -6,5 +6,6 @@
     </content>
     <orderEntry type="jdk" jdkName="Python 3.13 (Trust_Metric_Aggregator_Microservice)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="Trust_Managment_System" />
   </component>
 </module>
