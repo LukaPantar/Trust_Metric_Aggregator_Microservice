@@ -9,7 +9,7 @@ class MetricUrl(StrEnum):
     AVAILABILITY = ""
     RELIABILITY = ""
     ENERGY_EFFICIENCY = ""
-    LATENCY = "TODO"
+    LATENCY = ""
     THROUGHPUT = "node_network_receive_bytes_total"
     BANDWIDTH = "node_network_mtu_bytes"
     JITTER = ""

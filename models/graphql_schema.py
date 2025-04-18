@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from typing import List, Optional
 import strawberry
 
-# Response
 @strawberry.type
 class PerformanceMetrics:
     availability: Optional[float] = None
