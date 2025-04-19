@@ -1,13 +1,8 @@
-
-import strawberry
-import requests
 from fastapi import FastAPI
 import uvicorn
-from strawberry.fastapi import GraphQLRouter
-from prometheus_client.parser import text_string_to_metric_families
 
-from attributes.performance import measure_rate_of_metric, fetch_metric, MetricUrl, MetricLabels, query_prometheus, PromqlFunction, print_all_metrics
-from attributes.query import graphql_app
+from app.attributes.performance import fetch_metric, MetricUrl, MetricLabels, query_prometheus, PromqlFunction, print_all_metrics
+from app.attributes.query import graphql_app
 
 aggregator_app = FastAPI()
 

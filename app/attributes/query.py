@@ -1,7 +1,7 @@
 from strawberry.fastapi import GraphQLRouter
 
-from models.graphql_schema import *
-from attributes.performance import fetch_metric, MetricUrl, MetricLabels, query_prometheus, PromqlFunction
+from app.models.graphql_schema import *
+from app.attributes.performance import fetch_metric, MetricUrl, MetricLabels, query_prometheus, PromqlFunction
 
 prometheus_url = 'http://localhost:9090/'
 node_url = 'http://localhost:9100'
@@ -11,9 +11,9 @@ node_url = 'http://localhost:9100'
 class QueryMain:
 
     @strawberry.field
-    def performance_metrics(self, stakeholder_id: str) -> PerformanceMetrics:
-        return PerformanceMetrics(
-            availability=int(stakeholder_id),
+    def performance(self, stakeholder_id: str) -> Performance:
+        return Performance(
+            availability=1,
             reliability=1,
             energyEfficiency=1,
             latency=1,

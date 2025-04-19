@@ -1,9 +1,8 @@
-from fastapi import FastAPI
 from typing import List, Optional
 import strawberry
 
 @strawberry.type
-class PerformanceMetrics:
+class Performance:
     availability: Optional[float] = None
     reliability: Optional[float] = None
     energyEfficiency: Optional[float] = None
@@ -49,7 +48,7 @@ class ThirdPartyValidation:
 
 '''@strawberry.type
 class Attributes:
-    performance: PerformanceMetrics
+    performance: Performance
     identity: Identity
     reputation: Reputation
     direct_trust: DirectTrust
