@@ -11,37 +11,37 @@ node_url = 'http://localhost:9100'
 class QueryMain:
 
     @strawberry.field
-    def performance(self, stakeholder_id: str) -> Performance:
+    def performance(self, stakeholder_did: str) -> Performance:
         return Performance(
-            availability=1,
-            reliability=1,
-            energyEfficiency=1,
-            latency=1,
-            throughput=query_prometheus(prometheus_url, PromqlFunction.RATE, MetricUrl.THROUGHPUT, MetricLabels.NETWORK_DEVICE, 1),
-            bandwidth=fetch_metric(node_url, MetricUrl.BANDWIDTH, MetricLabels.NETWORK_DEVICE),
-            jitter=1,
-            packetLoss=1,
-            utilizationRate=1,
+            availability=query_prometheus(prometheus_url, PromqlFunction.AVG_OVER_TIME, MetricUrl.AVAILABILITY, MetricLabels.JOB_PROMETHEUS, "1h"),
+            reliability=query_prometheus(prometheus_url, PromqlFunction.RATE, MetricUrl.RELIABILITY, MetricLabels.IDLE_MODE, "5m"),
+            energyEfficiency=query_prometheus(prometheus_url, PromqlFunction.AVG_OVER_TIME, MetricUrl.ENERGY_EFFICIENCY, {}, "5m"),
+            latency=1,  # TODO using Blackbox exporter
+            throughput=1,  # TODO setup http server
+            bandwidth=query_prometheus(prometheus_url, PromqlFunction.RATE, MetricUrl.BANDWIDTH, MetricLabels.NETWORK_DEVICE_LO, "1m"),
+            jitter=1,  # TODO using Blackbox exporter
+            packetLoss=1,  # TODO using Blackbox exporter
+            utilizationRate=(1 - (fetch_metric(node_url, MetricUrl.UTILIZATION_RATE_AVAILABLE) / fetch_metric(node_url, MetricUrl.UTILIZATION_RATE_TOTAL))),
         )
 
     @strawberry.field
-    def identity(self, stakeholder_id: str) -> Identity:
+    def identity(self, stakeholder_did: str) -> Identity:
         return Identity(trust=1)
 
     @strawberry.field
-    def reputation(self, stakeholder_id: str) -> Reputation:
+    def reputation(self, stakeholder_did: str) -> Reputation:
         return Reputation(trust=1)
 
     @strawberry.field
-    def direct_trust(self, stakeholder_id: str) -> DirectTrust:
+    def direct_trust(self, stakeholder_did: str) -> DirectTrust:
         return DirectTrust(trust=0.8)
 
     @strawberry.field
-    def compliance(self, stakeholder_id: str) -> Compliance:
+    def compliance(self, stakeholder_did: str) -> Compliance:
         return Compliance(trust=1)
 
     @strawberry.field
-    def historical_behavior(self, stakeholder_id: str) -> HistoricalBehavior:
+    def historical_behavior(self, stakeholder_did: str) -> HistoricalBehavior:
         return HistoricalBehavior(trust=0.8)
 
     @strawberry.field
