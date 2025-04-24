@@ -45,16 +45,16 @@ class QueryMain:
         return HistoricalBehavior(trust=0.8)
 
     @strawberry.field
-    def location(self, stakeholder_id: str) -> Location:
+    def location(self, stakeholder_did: str) -> Location:
         return Location(lat=46.05,
                         lon=14.47)
 
     @strawberry.field
-    def contextual_fit(self, stakeholder_id: str) -> ContextualFit:
+    def contextual_fit(self, stakeholder_did: str) -> ContextualFit:
         return ContextualFit(trust=0.7)
 
     @strawberry.field
-    def third_party_validation(self, stakeholder_id: str) -> ThirdPartyValidation:
+    def third_party_validation(self, stakeholder_did: str) -> ThirdPartyValidation:
         return ThirdPartyValidation(trust=0.6)
 
 schema = strawberry.Schema(query=QueryMain)
