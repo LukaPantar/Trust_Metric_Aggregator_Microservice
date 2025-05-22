@@ -1,10 +1,19 @@
 from fastapi import FastAPI
 import uvicorn
+from contextlib import asynccontextmanager
 
 from app.attributes.performance import fetch_metric, MetricUrl, MetricLabels, query_prometheus, PromqlFunction, print_all_metrics
 from app.attributes.query import graphql_app
+from app.configuration import database
 
-aggregator_app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    print("Creating database and tables...")
+    database.create_db_and_tables()
+    yield
+
+aggregator_app = FastAPI(lifespan=lifespan)
 
 aggregator_app.include_router(graphql_app, prefix="/graphql")
 
