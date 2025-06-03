@@ -1,0 +1,35 @@
+
+services:
+  webserver:
+    build: ./webserver
+    ports:
+      - "5000:5000"
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - default
+    restart: unless-stopped
+
+  ping-exporter:
+    image: czerwonk/ping_exporter:latest
+    container_name: ping-exporter
+    ports:
+      - "9427:9427"
+    restart: unless-stopped
+    cap_add:
+      - NET_RAW
+    volumes:
+      - ./prometheus/ping_exporter.yml:/config/config.yml:ro

@@ -24,7 +24,7 @@ node_url = 'http://localhost:9100'
 def main():
 
     # Calculate rate of throughput
-    rate = query_prometheus(prometheus_url, PromqlFunction.RATE, MetricUrl.THROUGHPUT, MetricLabels.NETWORK_DEVICE_LO,"1m")
+    rate = query_prometheus(prometheus_url, MetricUrl.THROUGHPUT, MetricLabels.NETWORK_DEVICE_LO,PromqlFunction.RATE, "1m")
     if rate:
         print(f"Rate of throughput ({MetricUrl.THROUGHPUT}) for {MetricLabels.NETWORK_DEVICE_LO}: {rate:.2f} bytes/second")
     else:

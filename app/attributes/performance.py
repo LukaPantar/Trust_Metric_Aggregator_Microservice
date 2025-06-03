@@ -4,16 +4,17 @@ from typing import Optional
 from prometheus_client.parser import text_string_to_metric_families
 import time
 from enum import StrEnum
+import httpx
 
 class MetricUrl(StrEnum):
     AVAILABILITY = "up"
     RELIABILITY = "node_cpu_seconds_total"
     ENERGY_EFFICIENCY = "node_hwmon_in_volts"
     LATENCY = ""
-    THROUGHPUT = ""
+    THROUGHPUT = "http_requests_total"
     BANDWIDTH = "node_network_receive_bytes_total"
-    JITTER = ""
-    PACKET_LOSS = ""
+    JITTER = "ping_rtt_std_deviation_seconds"
+    PACKET_LOSS = "ping_loss_ratio"
     UTILIZATION_RATE_AVAILABLE = "node_memory_MemAvailable_bytes"
     UTILIZATION_RATE_TOTAL = "node_memory_MemTotal_bytes"
 
@@ -24,10 +25,13 @@ class PromqlFunction(StrEnum):
 
 
 class MetricLabels:
-    NETWORK_DEVICE_ETH = {"device": "enp59s0u1u4"}
+    NETWORK_DEVICE_ETH = {"device": "eth0"}
     NETWORK_DEVICE_LO = {"device": "lo"}
     JOB_PROMETHEUS = {"job": "prometheus"}
     IDLE_MODE = {"mode": "idle"}
+    JOB_NODE = {"job": "node"}
+    JOB_WEBSERVER={"job": "webserver"}
+    PING_TARGET={"target": "8.8.8.8"}
 
 
 def fetch_metric(metrics_url: str, metric_name: str, label_filter: dict = {}) -> Optional[float]:
@@ -42,9 +46,12 @@ def fetch_metric(metrics_url: str, metric_name: str, label_filter: dict = {}) ->
                     return sample.value
     return None
 
-def query_prometheus(metrics_url: str, promql_function: str, metric_name: str, label_filter: dict, duration_str: str) -> Optional[float]:
+def query_prometheus(metrics_url: str, metric_name: str, label_filter: dict, promql_function: str = "", duration_str: str = "") -> Optional[float]:
 
-    promql_query = f"{promql_function}({metric_name}[{duration_str}])"
+    if promql_function == "":
+        promql_query = f"{metric_name}"
+    else:
+        promql_query = f"{promql_function}({metric_name}[{duration_str}])"
 
     response = requests.get(
         f"{metrics_url}/api/v1/query",
@@ -70,3 +77,8 @@ def print_all_metrics(metrics_url):
         for sample in family.samples:
             name, labels, value = sample.name, sample.labels, sample.value
             print(f"Metric: {name}, Labels: {labels}, Value: {value}")
+
+def get_latency_ms(metrics_url: str) -> float:
+    with httpx.Client() as client:
+        response = client.get(metrics_url)
+        return response.elapsed.total_seconds() * 1000

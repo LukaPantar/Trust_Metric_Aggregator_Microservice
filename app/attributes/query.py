@@ -2,15 +2,14 @@ from strawberry.fastapi import GraphQLRouter
 from sqlmodel import Session, select
 from typing import Any
 from datetime import datetime
+import httpx
 
 from app.models.graphql_schema import *
-from app.attributes.performance import fetch_metric, MetricUrl, MetricLabels, query_prometheus, PromqlFunction
+from app.attributes.performance import fetch_metric, MetricUrl, MetricLabels, query_prometheus, PromqlFunction, get_latency_ms
 from app.configuration.database import get_session
 from app.models.sql_models import Stakeholder
 
 #prometheus_url = 'http://localhost:9090/'
-node_url = 'http://localhost:9100'
-
 
 # Root query
 @strawberry.type
@@ -22,15 +21,16 @@ class QueryMain:
         metrics_url = session.get(Stakeholder, stakeholder_did).metrics_url
 
         return Performance(
-            availability=query_prometheus(metrics_url, PromqlFunction.AVG_OVER_TIME, MetricUrl.AVAILABILITY, MetricLabels.JOB_PROMETHEUS, "1h"),
-            reliability=query_prometheus(metrics_url, PromqlFunction.RATE, MetricUrl.RELIABILITY, MetricLabels.IDLE_MODE, "5m"),
-            energyEfficiency=query_prometheus(metrics_url, PromqlFunction.AVG_OVER_TIME, MetricUrl.ENERGY_EFFICIENCY, {}, "5m"),
-            latency=1,  # TODO using Blackbox exporter
-            throughput=1,  # TODO setup http server
-            bandwidth=query_prometheus(metrics_url, PromqlFunction.RATE, MetricUrl.BANDWIDTH, MetricLabels.NETWORK_DEVICE_LO, "1m"),
-            jitter=1,  # TODO using Blackbox exporter
-            packetLoss=1,  # TODO using Blackbox exporter
-            utilizationRate=(1 - (fetch_metric(node_url, MetricUrl.UTILIZATION_RATE_AVAILABLE) / fetch_metric(node_url, MetricUrl.UTILIZATION_RATE_TOTAL))),
+            availability=query_prometheus(metrics_url, MetricUrl.AVAILABILITY, MetricLabels.JOB_PROMETHEUS, PromqlFunction.AVG_OVER_TIME, "1h"),
+            reliability=query_prometheus(metrics_url, MetricUrl.RELIABILITY, MetricLabels.IDLE_MODE, PromqlFunction.RATE, "5m"),
+            energyEfficiency=query_prometheus(metrics_url, MetricUrl.ENERGY_EFFICIENCY, {}, PromqlFunction.AVG_OVER_TIME, "5m"),
+            latency=get_latency_ms(metrics_url),
+            throughput=query_prometheus(metrics_url, MetricUrl.THROUGHPUT, MetricLabels.JOB_WEBSERVER, PromqlFunction.RATE, "1m"),
+            bandwidth=query_prometheus(metrics_url, MetricUrl.BANDWIDTH, MetricLabels.NETWORK_DEVICE_ETH, PromqlFunction.RATE, "1m"),
+            jitter=query_prometheus(metrics_url, MetricUrl.JITTER, MetricLabels.PING_TARGET, PromqlFunction.AVG_OVER_TIME, "5m"),
+            packetLoss=query_prometheus(metrics_url, MetricUrl.PACKET_LOSS, MetricLabels.PING_TARGET, PromqlFunction.AVG_OVER_TIME, "5m"),
+            utilizationRate=1 - (query_prometheus(metrics_url, MetricUrl.UTILIZATION_RATE_AVAILABLE, MetricLabels.JOB_NODE) /
+                                 query_prometheus(metrics_url, MetricUrl.UTILIZATION_RATE_TOTAL, MetricLabels.JOB_NODE)),
         )
 
     @strawberry.field
