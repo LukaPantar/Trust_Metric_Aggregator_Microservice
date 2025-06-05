@@ -9,14 +9,7 @@ services:
     # This allows you to access the FastAPI app from your host machine at http://localhost:8000
     ports:
       - "8000:8000"
-    environment:
-      # These environment variables will be passed to your aggregator microservice
-      # 'db' is the name of the database service defined below - Docker Compose handles internal DNS resolution
-      DATABASE_HOSTNAME: db
-      DATABASE_PORT: 5432
-      DATABASE_USERNAME: postgres # Matches the POSTGRES_USER in the db service
-      DATABASE_PASSWORD: your_strong_db_password # IMPORTANT: CHOOSE A SECURE PASSWORD HERE!
-      DATABASE_NAME: microscale_users # Matches the POSTGRES_DB in the db service
+    env_file: ".env"
     depends_on:
       - db # Ensures the database container starts before the aggregator
     networks:
@@ -26,10 +19,7 @@ services:
   db:
     image: postgres:16-alpine # Using a lightweight Alpine-based PostgreSQL image
     container_name: trust_aggregator_db
-    environment:
-      POSTGRES_DB: microscale_users # This will be the name of the database created
-      POSTGRES_USER: postgres # This will be the superuser username
-      POSTGRES_PASSWORD: your_strong_db_password # IMPORTANT: USE THE SAME SECURE PASSWORD AS ABOVE!
+    env_file: ".env"
     volumes:
       - postgres_data:/var/lib/postgresql/data # Persist data using a named volume
       # Mount the initialization script. Docker will execute it on first run when the volume is empty.
