@@ -1,0 +1,48 @@
+services:
+  # Your Trust Metric Aggregator Microservice
+  aggregator:
+    build:
+      context: . # Build the image from the Dockerfile in the current directory
+      dockerfile: Dockerfile # Specify the Dockerfile name explicitly (though 'Dockerfile' is default)
+    container_name: trust_aggregator_microservice
+    # Map host port 8000 to container port 8000 (adjust if your FastAPI app uses a different port)
+    # This allows you to access the FastAPI app from your host machine at http://localhost:8000
+    ports:
+      - "8000:8000"
+    environment:
+      # These environment variables will be passed to your aggregator microservice
+      # 'db' is the name of the database service defined below - Docker Compose handles internal DNS resolution
+      DATABASE_HOSTNAME: db
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres # Matches the POSTGRES_USER in the db service
+      DATABASE_PASSWORD: your_strong_db_password # IMPORTANT: CHOOSE A SECURE PASSWORD HERE!
+      DATABASE_NAME: microscale_users # Matches the POSTGRES_DB in the db service
+    depends_on:
+      - db # Ensures the database container starts before the aggregator
+    networks:
+      - trust_network # Connects to the custom network
+
+  # PostgreSQL Database Service
+  db:
+    image: postgres:16-alpine # Using a lightweight Alpine-based PostgreSQL image
+    container_name: trust_aggregator_db
+    environment:
+      POSTGRES_DB: microscale_users # This will be the name of the database created
+      POSTGRES_USER: postgres # This will be the superuser username
+      POSTGRES_PASSWORD: your_strong_db_password # IMPORTANT: USE THE SAME SECURE PASSWORD AS ABOVE!
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persist data using a named volume
+      # Mount the initialization script. Docker will execute it on first run when the volume is empty.
+      #- ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    # Expose PostgreSQL port to host (optional for internal communication, but useful for pgAdmin or local tools)
+    ports:
+      - "5432:5432"
+    networks:
+      - trust_network # Connects to the custom network
+
+volumes:
+  postgres_data: # Define the named volume for data persistence
+
+networks:
+  trust_network: # Define a custom bridge network for internal communication
+    driver: bridge
