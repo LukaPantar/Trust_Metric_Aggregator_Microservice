@@ -16,6 +16,7 @@ class Stakeholder(SQLModel, table=True):
     identity: str = Field()
 
     provider: Optional[str] = None
+    metrics_url: Optional[str] = None
 
     reputation: Optional[float] = None
     direct_trust: Optional[float] = None
@@ -27,5 +28,3 @@ class Stakeholder(SQLModel, table=True):
     third_party_validation: Optional[float] = None
 
     created_at: datetime
-
-    metrics_url: str
