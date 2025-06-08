@@ -4,6 +4,8 @@ services:
     build: ./webserver
     ports:
       - "5000:5000"
+    networks:
+      - trust_network
 
   prometheus:
     image: prom/prometheus
@@ -13,6 +15,8 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
       - "9090:9090"
+    networks:
+      - trust_network
 
   node-exporter:
     image: prom/node-exporter
@@ -20,7 +24,7 @@ services:
     ports:
       - "9100:9100"
     networks:
-      - default
+      - trust_network
     restart: unless-stopped
 
   ping-exporter:
@@ -33,3 +37,9 @@ services:
       - NET_RAW
     volumes:
       - ./prometheus/ping_exporter.yml:/config/config.yml:ro
+    networks:
+      - trust_network
+
+networks:
+  trust_network:
+    external: true
