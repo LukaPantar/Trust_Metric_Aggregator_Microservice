@@ -34,5 +34,5 @@ volumes:
   postgres_data: # Define the named volume for data persistence
 
 networks:
-  trust_network: # Define a custom bridge network for internal communication
-    driver: bridge
+  trust_network:
+    external: true
