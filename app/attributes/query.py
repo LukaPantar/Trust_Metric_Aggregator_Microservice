@@ -9,8 +9,6 @@ from app.attributes.performance import fetch_metric, MetricUrl, MetricLabels, qu
 from app.configuration.database import get_session
 from app.models.sql_models import Stakeholder
 
-#prometheus_url = 'http://localhost:9090/'
-
 # Root query
 @strawberry.type
 class QueryMain:
@@ -23,7 +21,8 @@ class QueryMain:
         return Performance(
             availability=query_prometheus(metrics_url, MetricUrl.AVAILABILITY, MetricLabels.JOB_PROMETHEUS, PromqlFunction.AVG_OVER_TIME, "1h"),
             reliability=query_prometheus(metrics_url, MetricUrl.RELIABILITY, MetricLabels.IDLE_MODE, PromqlFunction.RATE, "5m"),
-            energyEfficiency=query_prometheus(metrics_url, MetricUrl.ENERGY_EFFICIENCY, {}, PromqlFunction.AVG_OVER_TIME, "5m"),
+            # energyEfficiency=query_prometheus(metrics_url, MetricUrl.ENERGY_EFFICIENCY, {}, PromqlFunction.AVG_OVER_TIME, "5m"),
+            energyEfficiency=10,  # TODO
             latency=get_latency_ms(metrics_url),
             throughput=query_prometheus(metrics_url, MetricUrl.THROUGHPUT, MetricLabels.JOB_WEBSERVER, PromqlFunction.RATE, "1m"),
             bandwidth=query_prometheus(metrics_url, MetricUrl.BANDWIDTH, MetricLabels.NETWORK_DEVICE_ETH, PromqlFunction.RATE, "1m"),
