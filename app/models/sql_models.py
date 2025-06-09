@@ -28,3 +28,4 @@ class Stakeholder(SQLModel, table=True):
     third_party_validation: Optional[float] = None
 
     created_at: datetime
+    owner: str
