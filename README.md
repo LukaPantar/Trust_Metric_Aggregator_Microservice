@@ -1,37 +1,60 @@
 # Trust_Metric_Aggregator_Microservice
 
-This repository contains microservice for aggregating and sending any required data for trust calculation.
+This repository contains the microservice for aggregating and sending any required data for trust calculation in a distributed trust management system.
 
-## Architecture and used technology
+## Architecture and Used Technology
 
-Microservice is written in [Python](https://www.python.org/) 3.13+ and uses Python implementation
-of [GraphQL](https://graphql.org/) query language named [Strawberry](https://strawberry.rocks/) for communication between microservices.
-[Prometheus](https://prometheus.io/) (and its additional exporter [Node exporter](https://github.com/prometheus/node_exporter))
-is used for collection and querying of individual performance metrics.
-Python packaging and dependency management is done with [Poetry](https://python-poetry.org/).
+- **Language:** [Python](https://www.python.org/) 3.13+
+- **API:** [Strawberry GraphQL](https://strawberry.rocks/) for inter-microservice communication
+- **Metrics:** [Prometheus](https://prometheus.io/) and [Node Exporter](https://github.com/prometheus/node_exporter) for performance metric collection
+- **Dependency Management:** [Poetry](https://python-poetry.org/)
+- **Containerization:** [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
 
-Microservice exposes on port `8000`:
-- GraphQL server for sending specific data for trust attributes. It can be accessed through `/graphql` path.
+The microservice exposes a GraphQL server on port `8000` at the `/graphql` path for trust attribute data queries.
 
-## Local testing (Linux)
+## Quick Start (Docker Compose)
 
- Make sure the following tools are installed:
-- [Python](https://www.python.org/) 3.13+,
-- [Poetry](https://python-poetry.org/),
-- [Prometheus](https://prometheus.io/),
-- [Node exporter](https://github.com/prometheus/node_exporter)
+1. **Clone the repository and enter the folder:**
+   ```powershell
+   git clone https://github.com/LukaPantar/Trust_Metric_Aggregator_Microservice
+   cd TrustMetricAggregatorMicroservice
+   ```
 
-Currently only local machine can be used as an observed stakeholder, therefore it is necessary 
-to use configuration file `performance.yml` for your local Prometheus client. 
-This ensures Prometheus endpoint to run on port `9090` and Node exporter endpoint on port `9100`.
-After initializing and activating Python virtual environment we install dependencies and start the application with:
-```bash
-$ poetry install
-$ poetry run python main.py
-```
+2. **Create the `.env` file:**
+   - Copy the contents of `.env.TEMPLATE` to a new file named `.env` in the same directory.
 
-Any valid GraphQL query can now be input through `/graphql` path manually or through other microservices.
+3. **(Optional, if running with other microservices)**
+   - Ensure a Docker network exists for inter-service communication:
+     ```powershell
+     docker network create trust-network
+     ```
+
+4. **Start the microservice with Docker Compose:**
+   ```powershell
+   docker compose up --build
+   ```
+   - The service will be available at `http://localhost:8000/graphql`.
+
+5. **(Optional) Testing with Prometheus**
+   - A test Prometheus service is provided in `test_service/`. You can use its `docker-compose.yml` to spin up a test Prometheus and Node Exporter environment for local metric collection.
 
 ## Configuration
 
- - `configuration/performance.yml` is used to configure local Prometheus and Node exporter and should be integrated into observed Prometheus client.
+- `.env` — Environment variables for the microservice (see `.env.TEMPLATE` for required keys)
+- `app/configuration/performance.yml` — Used to configure Prometheus and Node Exporter endpoints
+
+## Manual Local Testing (Advanced)
+
+If you wish to run the service outside Docker:
+1. Ensure Python 3.13+ and Poetry are installed.
+2. Install dependencies and run:
+   ```powershell
+   poetry install
+   poetry run python main.py
+   ```
+3. The GraphQL endpoint will be available at `http://localhost:8000/graphql`.
+
+## Notes
+- For full system operation, ensure all microservices are running and connected to the same Docker network.
+- Only the `.env.TEMPLATE` is committed; you must create your own `.env` file before starting the service.
+- For Prometheus metric testing, see the `test_service/` directory for example configurations.
