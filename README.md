@@ -12,47 +12,31 @@ This repository contains the microservice for aggregating and sending any requir
 
 The microservice exposes a GraphQL server on port `8000` at the `/graphql` path for trust attribute data queries.
 
-## Quick Start (Docker Compose)
+## Setup Instructions
 
-1. **Clone the repository and enter the folder:**
+### 1. **Clone the repository and enter the folder:**
    ```powershell
    git clone https://github.com/LukaPantar/Trust_Metric_Aggregator_Microservice
    cd TrustMetricAggregatorMicroservice
    ```
 
-2. **Create the `.env` file:**
+### 2. **Create the `.env` file:**
    - Copy the contents of `.env.TEMPLATE` to a new file named `.env` in the same directory.
 
-3. **(Optional, if running with other microservices)**
+### 3. **(Optional, if running with other microservices)**
    - Ensure a Docker network exists for inter-service communication:
      ```powershell
      docker network create trust-network
      ```
 
-4. **Start the microservice with Docker Compose:**
+### 4. **Start the microservice with Docker Compose:**
    ```powershell
    docker compose up --build
    ```
    - The service will be available at `http://localhost:8000/graphql`.
 
-5. **(Optional) Testing with Prometheus**
+### 5. **(Optional) Testing with Prometheus**
    - A test Prometheus service is provided in `test_service/`. You can use its `docker-compose.yml` to spin up a test Prometheus and Node Exporter environment for local metric collection.
-
-## Configuration
-
-- `.env` — Environment variables for the microservice (see `.env.TEMPLATE` for required keys)
-- `app/configuration/performance.yml` — Used to configure Prometheus and Node Exporter endpoints
-
-## Manual Local Testing (Advanced)
-
-If you wish to run the service outside Docker:
-1. Ensure Python 3.13+ and Poetry are installed.
-2. Install dependencies and run:
-   ```powershell
-   poetry install
-   poetry run python main.py
-   ```
-3. The GraphQL endpoint will be available at `http://localhost:8000/graphql`.
 
 ## Notes
 - For full system operation, ensure all microservices are running and connected to the same Docker network.
